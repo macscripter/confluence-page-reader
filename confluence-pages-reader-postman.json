@@ -1,0 +1,88 @@
+{
+  "info": {
+    "name": "Confluence Pages Reader (REST)",
+    "description": "Read-only Confluence pages API. Fill the collection variables (baseUrl, confluenceUrl, confluenceToken; confluenceEmail for Cloud, then enable the X-Confluence-Email header on the requests) and run any request directly. No handshake or session is needed.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "confluenceUrl", "value": "https://confluence.yourcompany.com" },
+    { "key": "confluenceToken", "value": "" },
+    { "key": "confluenceEmail", "value": "" },
+    { "key": "pageId", "value": "131664681" },
+    { "key": "spaceKey", "value": "SC3" },
+    { "key": "pageTitle", "value": "Page title here" },
+    { "key": "searchQuery", "value": "DOME" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+        "description": "Liveness check. Needs no credentials. Expect {\"status\":\"ok\"}."
+      }
+    },
+    {
+      "name": "Search pages",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Confluence-Url", "value": "{{confluenceUrl}}" },
+          { "key": "X-Confluence-Token", "value": "{{confluenceToken}}" },
+          { "key": "X-Confluence-Email", "value": "{{confluenceEmail}}", "disabled": true }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/search?query={{searchQuery}}&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["search"],
+          "query": [
+            { "key": "query", "value": "{{searchQuery}}", "description": "Free-text search" },
+            { "key": "limit", "value": "10" },
+            { "key": "cql", "value": "space=SC3 AND text ~ \"DOME\"", "description": "Raw CQL; overrides 'query' when enabled", "disabled": true }
+          ]
+        },
+        "description": "Free-text page search. Enable the 'cql' query parameter instead for raw CQL. Enable the X-Confluence-Email header only for Confluence Cloud."
+      }
+    },
+    {
+      "name": "Get page by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Confluence-Url", "value": "{{confluenceUrl}}" },
+          { "key": "X-Confluence-Token", "value": "{{confluenceToken}}" },
+          { "key": "X-Confluence-Email", "value": "{{confluenceEmail}}", "disabled": true }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/pages/{{pageId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["pages", "{{pageId}}"]
+        },
+        "description": "Returns title, space, version, text preview and the raw storage body. Enable the X-Confluence-Email header only for Confluence Cloud."
+      }
+    },
+    {
+      "name": "Get page by title",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Confluence-Url", "value": "{{confluenceUrl}}" },
+          { "key": "X-Confluence-Token", "value": "{{confluenceToken}}" },
+          { "key": "X-Confluence-Email", "value": "{{confluenceEmail}}", "disabled": true }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/pages/by-title?space_key={{spaceKey}}&title={{pageTitle}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["pages", "by-title"],
+          "query": [
+            { "key": "space_key", "value": "{{spaceKey}}" },
+            { "key": "title", "value": "{{pageTitle}}" }
+          ]
+        },
+        "description": "Exact-title lookup within a space; same payload as Get page by ID, 404 when not found. Enable the X-Confluence-Email header only for Confluence Cloud."
+      }
+    }
+  ]
+}
