@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "Atlassian Reader (Confluence + Jira)",
+    "description": "Read-only Confluence pages and Jira issues over the same endpoints. Fill the collection variables (baseUrl, atlassianUrl, atlassianToken; atlassianEmail for Cloud, then enable the X-Atlassian-Email header). The product is detected per request; enable the X-Atlassian-Product header on any request to force it.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "atlassianUrl", "value": "https://confluence.yourcompany.com" },
+    { "key": "jiraUrl", "value": "https://jira.yourcompany.com" },
+    { "key": "atlassianToken", "value": "" },
+    { "key": "atlassianEmail", "value": "" },
+    { "key": "pageId", "value": "131664681" },
+    { "key": "spaceKey", "value": "SC3" },
+    { "key": "pageTitle", "value": "Page title here" },
+    { "key": "issueKey", "value": "SIMPL-42" },
+    { "key": "projectKey", "value": "SIMPL" },
+    { "key": "searchQuery", "value": "DOME" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+        "description": "Liveness check. Needs no credentials. Expect status ok and the two supported products."
+      }
+    },
+    {
+      "name": "Confluence",
+      "item": [
+        {
+          "name": "Get page by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pages/{{pageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pages", "{{pageId}}"]
+            },
+            "description": "A numeric id is detected as Confluence. Returns title, space, version, text preview and the raw storage body."
+          }
+        },
+        {
+          "name": "Get page by title",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pages/by-title?space_key={{spaceKey}}&title={{pageTitle}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pages", "by-title"],
+              "query": [
+                { "key": "space_key", "value": "{{spaceKey}}" },
+                { "key": "title", "value": "{{pageTitle}}" }
+              ]
+            },
+            "description": "Exact title match within a space. 404 when not found."
+          }
+        },
+        {
+          "name": "Search pages (free text)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/search?query={{searchQuery}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["search"],
+              "query": [
+                { "key": "query", "value": "{{searchQuery}}" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Free text against page body and title."
+          }
+        },
+        {
+          "name": "Search pages (raw CQL)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/search?cql=space%3DSC3 AND text ~ \"DOME\"&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["search"],
+              "query": [
+                { "key": "cql", "value": "space=SC3 AND text ~ \"DOME\"" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "A cql parameter forces Confluence, whatever the URL looks like."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jira",
+      "item": [
+        {
+          "name": "Get issue by key",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "jira", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pages/{{issueKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pages", "{{issueKey}}"]
+            },
+            "description": "The PROJ-123 shape is detected as a Jira key on the same endpoint as pages. Use /issues/{{issueKey}} for a more readable URL; the behaviour is identical."
+          }
+        },
+        {
+          "name": "Get issue by key (alias route)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["issues", "{{issueKey}}"]
+            },
+            "description": "Same handler as /pages/{key}, readable URL."
+          }
+        },
+        {
+          "name": "Search issues (free text)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "jira" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/search?query={{searchQuery}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["search"],
+              "query": [
+                { "key": "query", "value": "{{searchQuery}}" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Free text has no product hint of its own, so the X-Atlassian-Product header is enabled here to force Jira."
+          }
+        },
+        {
+          "name": "Search issues (raw JQL)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/search?jql=project %3D SIMPL AND status !%3D Done ORDER BY updated DESC&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["search"],
+              "query": [
+                { "key": "jql", "value": "project = SIMPL AND status != Done ORDER BY updated DESC" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "A jql parameter forces Jira, whatever the URL looks like."
+          }
+        },
+        {
+          "name": "Get issue by summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
+              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
+              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
+              { "key": "X-Atlassian-Product", "value": "jira" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pages/by-title?space_key={{projectKey}}&title={{searchQuery}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pages", "by-title"],
+              "query": [
+                { "key": "space_key", "value": "{{projectKey}}", "description": "Project key" },
+                { "key": "title", "value": "{{searchQuery}}", "description": "Summary text" }
+              ]
+            },
+            "description": "Jira matches summaries by word rather than exactly, so this returns the best match, most recently updated first. 404 when nothing matches."
+          }
+        }
+      ]
+    }
+  ]
+}
