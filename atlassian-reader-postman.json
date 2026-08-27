@@ -1,21 +1,70 @@
 {
   "info": {
-    "name": "Atlassian Reader (Confluence + Jira)",
-    "description": "Read-only Confluence pages and Jira issues over the same endpoints. Fill the collection variables (baseUrl, atlassianUrl, atlassianToken; atlassianEmail for Cloud, then enable the X-Atlassian-Email header). The product is detected per request; enable the X-Atlassian-Product header on any request to force it.",
+    "name": "Atlassian API (Confluence read, Jira read + write)",
+    "description": "Confluence pages (read) and Jira issues (read and write) over one service. Fill the collection variables (baseUrl, atlassianUrl, jiraUrl, atlassianToken; atlassianEmail for Cloud, then enable the X-Atlassian-Email header). On the shared read endpoints the product is detected per request; enable the X-Atlassian-Product header to force it. The /issues, /projects and /issue-links routes always target Jira. Every write is attributed in Jira to the owner of the token sent.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8000" },
-    { "key": "atlassianUrl", "value": "https://confluence.yourcompany.com" },
-    { "key": "jiraUrl", "value": "https://jira.yourcompany.com" },
-    { "key": "atlassianToken", "value": "" },
-    { "key": "atlassianEmail", "value": "" },
-    { "key": "pageId", "value": "131664681" },
-    { "key": "spaceKey", "value": "SC3" },
-    { "key": "pageTitle", "value": "Page title here" },
-    { "key": "issueKey", "value": "SIMPL-42" },
-    { "key": "projectKey", "value": "SIMPL" },
-    { "key": "searchQuery", "value": "DOME" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "atlassianUrl",
+      "value": "https://confluence.yourcompany.com"
+    },
+    {
+      "key": "jiraUrl",
+      "value": "https://jira.yourcompany.com"
+    },
+    {
+      "key": "atlassianToken",
+      "value": ""
+    },
+    {
+      "key": "atlassianEmail",
+      "value": ""
+    },
+    {
+      "key": "pageId",
+      "value": "131664681"
+    },
+    {
+      "key": "spaceKey",
+      "value": "SC3"
+    },
+    {
+      "key": "pageTitle",
+      "value": "Page title here"
+    },
+    {
+      "key": "issueKey",
+      "value": "SIMPL-42"
+    },
+    {
+      "key": "projectKey",
+      "value": "SIMPL"
+    },
+    {
+      "key": "searchQuery",
+      "value": "DOME"
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    },
+    {
+      "key": "linkToKey",
+      "value": "SIMPL-43"
+    },
+    {
+      "key": "transition",
+      "value": "Done"
+    },
+    {
+      "key": "assignee",
+      "value": "you@company.com"
+    }
   ],
   "item": [
     {
@@ -23,8 +72,16 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
-        "description": "Liveness check. Needs no credentials. Expect status ok and the two supported products."
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Liveness check. Needs no credentials. Expect status ok, the two supported products and the capabilities list (confluence:read, jira:read, jira:write)."
       }
     },
     {
@@ -35,15 +92,34 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{atlassianUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "confluence",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/pages/{{pageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["pages", "{{pageId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pages",
+                "{{pageId}}"
+              ]
             },
             "description": "A numeric id is detected as Confluence. Returns title, space, version, text preview and the raw storage body."
           }
@@ -53,18 +129,43 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{atlassianUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "confluence",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/pages/by-title?space_key={{spaceKey}}&title={{pageTitle}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["pages", "by-title"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pages",
+                "by-title"
+              ],
               "query": [
-                { "key": "space_key", "value": "{{spaceKey}}" },
-                { "key": "title", "value": "{{pageTitle}}" }
+                {
+                  "key": "space_key",
+                  "value": "{{spaceKey}}"
+                },
+                {
+                  "key": "title",
+                  "value": "{{pageTitle}}"
+                }
               ]
             },
             "description": "Exact title match within a space. 404 when not found."
@@ -75,18 +176,42 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "confluence", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{atlassianUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "confluence",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/search?query={{searchQuery}}&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["search"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
               "query": [
-                { "key": "query", "value": "{{searchQuery}}" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "query",
+                  "value": "{{searchQuery}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
             "description": "Free text against page body and title."
@@ -97,17 +222,37 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{atlassianUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{atlassianUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/search?cql=space%3DSC3 AND text ~ \"DOME\"&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["search"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
               "query": [
-                { "key": "cql", "value": "space=SC3 AND text ~ \"DOME\"" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "cql",
+                  "value": "space=SC3 AND text ~ \"DOME\""
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
             "description": "A cql parameter forces Confluence, whatever the URL looks like."
@@ -123,15 +268,34 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "jira", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "jira",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/pages/{{issueKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["pages", "{{issueKey}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pages",
+                "{{issueKey}}"
+              ]
             },
             "description": "The PROJ-123 shape is detected as a Jira key on the same endpoint as pages. Use /issues/{{issueKey}} for a more readable URL; the behaviour is identical."
           }
@@ -141,14 +305,29 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/issues/{{issueKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["issues", "{{issueKey}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}"
+              ]
             },
             "description": "Same handler as /pages/{key}, readable URL."
           }
@@ -158,18 +337,41 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "jira" }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "jira"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/search?query={{searchQuery}}&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["search"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
               "query": [
-                { "key": "query", "value": "{{searchQuery}}" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "query",
+                  "value": "{{searchQuery}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
             "description": "Free text has no product hint of its own, so the X-Atlassian-Product header is enabled here to force Jira."
@@ -180,17 +382,37 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/search?jql=project %3D SIMPL AND status !%3D Done ORDER BY updated DESC&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["search"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
               "query": [
-                { "key": "jql", "value": "project = SIMPL AND status != Done ORDER BY updated DESC" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "jql",
+                  "value": "project = SIMPL AND status != Done ORDER BY updated DESC"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
             "description": "A jql parameter forces Jira, whatever the URL looks like."
@@ -201,21 +423,826 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "X-Atlassian-Url", "value": "{{jiraUrl}}" },
-              { "key": "X-Atlassian-Token", "value": "{{atlassianToken}}" },
-              { "key": "X-Atlassian-Email", "value": "{{atlassianEmail}}", "disabled": true },
-              { "key": "X-Atlassian-Product", "value": "jira" }
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "X-Atlassian-Product",
+                "value": "jira"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/pages/by-title?space_key={{projectKey}}&title={{searchQuery}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["pages", "by-title"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pages",
+                "by-title"
+              ],
               "query": [
-                { "key": "space_key", "value": "{{projectKey}}", "description": "Project key" },
-                { "key": "title", "value": "{{searchQuery}}", "description": "Summary text" }
+                {
+                  "key": "space_key",
+                  "value": "{{projectKey}}",
+                  "description": "Project key"
+                },
+                {
+                  "key": "title",
+                  "value": "{{searchQuery}}",
+                  "description": "Summary text"
+                }
               ]
             },
             "description": "Jira matches summaries by word rather than exactly, so this returns the best match, most recently updated first. 404 when nothing matches."
+          }
+        },
+        {
+          "name": "Search free text in a project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/search?query={{searchQuery}}&project_key={{projectKey}}&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "{{searchQuery}}"
+                },
+                {
+                  "key": "project_key",
+                  "value": "{{projectKey}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Free-text search restricted to one project. With an empty query it lists the project's most recently updated issues."
+          }
+        },
+        {
+          "name": "Issue comments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/comments?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Comments on the issue, oldest first: id, author, created, updated, text."
+          }
+        },
+        {
+          "name": "Issue transitions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/transitions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "transitions"
+              ]
+            },
+            "description": "Workflow transitions available from the current status: id, name, to_status. Use one with the transition request."
+          }
+        },
+        {
+          "name": "Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Projects visible to the token owner: key, name, id, type."
+          }
+        },
+        {
+          "name": "Project issue types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectKey}}/issue-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectKey}}",
+                "issue-types"
+              ]
+            },
+            "description": "Issue types the project accepts, with the subtask flag."
+          }
+        },
+        {
+          "name": "Issue link types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issue-link-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issue-link-types"
+              ]
+            },
+            "description": "Link types with their outward and inward wording, e.g. Blocks: blocks / is blocked by."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jira write",
+      "item": [
+        {
+          "name": "Create issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues"
+              ]
+            },
+            "description": "Create an issue. issue_type defaults to Task. description is plain text (Cloud: converted to ADF, blank line = new paragraph; Data Center: wiki markup as-is). assignee takes a username/accountId or an email/display name. parent_key makes a sub-task. extra_fields is a raw Jira fields object for anything else, e.g. custom fields.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_key\": \"{{projectKey}}\",\n  \"summary\": \"Created from Postman\",\n  \"issue_type\": \"Task\",\n  \"description\": \"First paragraph.\\n\\nSecond paragraph.\",\n  \"priority\": \"Medium\",\n  \"labels\": [\n    \"postman\"\n  ],\n  \"extra_fields\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create sub-task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues"
+              ]
+            },
+            "description": "Sub-task under issueKey. The issue_type must be one of the project's sub-task types (see Project issue types).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_key\": \"{{projectKey}}\",\n  \"summary\": \"Sub-task from Postman\",\n  \"issue_type\": \"Sub-task\",\n  \"parent_key\": \"{{issueKey}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update issue",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}"
+              ]
+            },
+            "description": "Change only the fields you send. labels replaces the whole set. PUT is accepted as an alias. To change the status use the transition request.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Updated summary\",\n  \"priority\": \"High\",\n  \"labels\": [\n    \"postman\",\n    \"updated\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Add comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "comments"
+              ]
+            },
+            "description": "Post a comment. Same text handling as description. Returns 201 with comment_id; copy it into the commentId variable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Comment from Postman.\\nSecond line.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Edit comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Edit a comment in place. Only comments the token owner may edit, in practice their own.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Edited comment text.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete comment (preview)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Without confirm=true this returns 400 with the comment that would be deleted."
+          }
+        },
+        {
+          "name": "Delete comment (confirm)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/comments/{{commentId}}?confirm=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "comments",
+                "{{commentId}}"
+              ],
+              "query": [
+                {
+                  "key": "confirm",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Deletes the comment. Irreversible."
+          }
+        },
+        {
+          "name": "Transition issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/transitions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "transitions"
+              ]
+            },
+            "description": "transition is a transition id, its name, or the target status name (case-insensitive). No match returns 400 with the available transitions. comment and resolution are optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transition\": \"{{transition}}\",\n  \"comment\": \"Moved from Postman.\",\n  \"resolution\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign issue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/assignee",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "assignee"
+              ]
+            },
+            "description": "assignee: username (Data Center) or accountId (Cloud), or an email address / display name to look up. Empty string unassigns; -1 uses the project default.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignee\": \"{{assignee}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Unassign issue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}/assignee",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}",
+                "assignee"
+              ]
+            },
+            "description": "Empty assignee removes the current assignee.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignee\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Link issues",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issue-links",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issue-links"
+              ]
+            },
+            "description": "Read as from_key <link_type> to_key: issueKey blocks linkToKey. A type name or its outward/inward wording; the inward wording (is blocked by) flips the direction. No match returns 400 with the available types.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_key\": \"{{issueKey}}\",\n  \"to_key\": \"{{linkToKey}}\",\n  \"link_type\": \"Blocks\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete issue (preview)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}"
+              ]
+            },
+            "description": "Without confirm=true this returns 400 with the issue and its sub-tasks that would be deleted."
+          }
+        },
+        {
+          "name": "Delete issue (confirm)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Atlassian-Url",
+                "value": "{{jiraUrl}}"
+              },
+              {
+                "key": "X-Atlassian-Token",
+                "value": "{{atlassianToken}}"
+              },
+              {
+                "key": "X-Atlassian-Email",
+                "value": "{{atlassianEmail}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/issues/{{issueKey}}?confirm=true&delete_subtasks=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "issues",
+                "{{issueKey}}"
+              ],
+              "query": [
+                {
+                  "key": "confirm",
+                  "value": "true"
+                },
+                {
+                  "key": "delete_subtasks",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Deletes the issue and its sub-tasks. Irreversible: Jira has no trash for issues."
           }
         }
       ]
